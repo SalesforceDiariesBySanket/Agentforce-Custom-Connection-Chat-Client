@@ -1,50 +1,48 @@
-# React + TypeScript + Vite
+# Client — Agentforce Custom Chat Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The React + TypeScript + Vite frontend for the Agentforce Custom Chat Client. It
+renders the chat UI, parses the Agent API Server-Sent Event stream, and turns
+custom-connection **structured response formats** into native UI (quick-reply
+choices and image card carousels), falling back to streamed plain text.
 
-Currently, two official plugins are available:
+See the [root README](../README.md) for the full architecture and an explanation
+of how the custom connection works end to end.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Develop
 
-## Expanding the ESLint configuration
+This package is part of a pnpm workspace. Install from the repository root:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+pnpm install
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+Then run the client (it expects the proxy server on `http://localhost:8080`):
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+```bash
+# from the repository root — starts both server and client
+pnpm dev
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+# or just the client
+pnpm dev:client
 ```
+
+The dev server runs at http://localhost:5173.
+
+## Scripts
+
+- `pnpm dev` — start the Vite dev server
+- `pnpm build` — type-check and build for production (output in `dist/`)
+- `pnpm lint` — run ESLint
+- `pnpm preview` — preview the production build locally
+
+## Environment
+
+| Variable       | Description     | Required                                     |
+| -------------- | --------------- | -------------------------------------------- |
+| `VITE_API_URL` | Backend API URL | No (defaults to `http://localhost:8080/api`) |
+
+## Where things live
+
+- `src/hooks/useAgentApi.ts` — SSE parsing and response-format extraction
+- `src/components/chat/formatRegistry.ts` — maps runtime format names to renderers
+- `src/components/chat/ResponseFormats.tsx` — renders text choices and image cards

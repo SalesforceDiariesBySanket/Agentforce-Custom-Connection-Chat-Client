@@ -1,107 +1,68 @@
 import { FastifySchema } from "fastify";
 
-export const commonSchemas = {
-  headers: {
-    type: "object",
-    required: ["authorization", "x-conversation-id"],
-    properties: {
-      authorization: { type: "string", pattern: "^Bearer " },
-      "x-conversation-id": { type: "string", format: "uuid" },
-    },
-  },
-  successResponse: {
-    type: "object",
-    properties: {
-      success: { type: "boolean" },
-    },
+const responseFormatSchema = {
+  type: ["object", "null"],
+  properties: {
+    name: { type: "string" },
+    data: {},
   },
 } as const;
 
-// Route-specific schemas
-export const messageSchema: FastifySchema = {
-  headers: commonSchemas.headers,
-  body: {
-    type: "object",
-    required: ["message"],
-    properties: {
-      message: { type: "string", minLength: 1 },
-    },
+const clientMessageSchema = {
+  type: "object",
+  required: ["id", "type", "content"],
+  properties: {
+    id: { type: "string" },
+    type: { type: "string" },
+    content: { type: "string" },
+    feedbackId: { type: "string" },
+    format: responseFormatSchema,
   },
-  response: {
-    200: commonSchemas.successResponse,
-  },
-};
+} as const;
 
-export const typingSchema: FastifySchema = {
-  headers: commonSchemas.headers,
-  body: {
-    type: "object",
-    required: ["isTyping"],
-    properties: {
-      isTyping: { type: "boolean" },
-    },
-  },
-  response: {
-    200: commonSchemas.successResponse,
-  },
-};
-
-export const serverSentEventsSchema: FastifySchema = {
-  querystring: {
-    type: "object",
-    properties: {
-      token: { type: "string" },
-    },
-    required: ["token"],
-  },
-};
-
-export const messagesSchema: FastifySchema = {
-  headers: commonSchemas.headers,
+export const createSessionSchema: FastifySchema = {
   response: {
     200: {
       type: "object",
+      required: ["sessionId", "messages"],
       properties: {
-        entries: {
+        sessionId: { type: "string" },
+        messages: {
           type: "array",
-          items: {
-            type: "object",
-            required: ["id", "content", "sender", "timestamp"],
-            properties: {
-              id: { type: "string" },
-              content: { type: "string" },
-              sender: {
-                type: "object",
-                required: ["role", "displayName"],
-                properties: {
-                  role: { type: "string" },
-                  displayName: { type: "string" },
-                },
-              },
-              timestamp: { type: "number" },
-            },
-          },
+          items: clientMessageSchema,
         },
       },
     },
   },
 };
 
-export const initializeSchema: FastifySchema = {
-  response: {
-    200: {
-      type: "object",
-      properties: {
-        accessToken: { type: "string" },
-        conversationId: { type: "string" },
-      },
+// No response schema: this route streams Server-Sent Events on the raw socket.
+export const sendMessageSchema: FastifySchema = {
+  body: {
+    type: "object",
+    required: ["sessionId", "message", "sequenceId"],
+    properties: {
+      sessionId: { type: "string", minLength: 1 },
+      message: { type: "string", minLength: 1 },
+      sequenceId: { type: "number" },
     },
   },
 };
 
-export const endChatSchema: FastifySchema = {
-  headers: commonSchemas.headers,
+export const endSessionSchema: FastifySchema = {
+  body: {
+    type: "object",
+    required: ["sessionId"],
+    properties: {
+      sessionId: { type: "string" },
+    },
+  },
   response: {
-    200: commonSchemas.successResponse,
+    200: {
+      type: "object",
+      properties: {
+        success: { type: "boolean" },
+      },
+    },
   },
 };

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AiResponseFormat xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Use this format to present the user with a short list of text-only options to choose from, such as a menu or a disambiguation prompt. Use it only when there are GREATER THAN 1 and FEWER THAN 8 mutually exclusive choices and none of the choices needs an image.</description>
+    <input>{"type":"object","properties":{"message":{"type":"string","description":"A short prompt that introduces the choices."},"choices":{"type":"array","items":{"type":"string"},"description":"The selectable text options."}},"required":["message","choices"]}</input>
+    <instructions>
+        <instruction>Use TextChoices when offering the user GREATER THAN 1 and FEWER THAN 8 text-only options. Put the introductory sentence in "message" and each option as a string in "choices".</instruction>
+        <sortOrder>1</sortOrder>
+    </instructions>
+    <masterLabel>Text Choices</masterLabel>
+</AiResponseFormat>

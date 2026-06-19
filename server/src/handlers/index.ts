@@ -1,5 +1,3 @@
-export * from "./chat-end-handler";
+export * from "./salesforce-auth";
+export * from "./chat-session-handler";
 export * from "./chat-message-handler";
-export * from "./chat-typing-handler";
-export * from "./chat-initialize-handler";
-export * from "./chat-sse-handler";

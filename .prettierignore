@@ -1,1 +1,19 @@
+# Dependencies and build output
 node_modules
+**/node_modules
+dist
+**/dist
+coverage
+
+# Lockfiles
+pnpm-lock.yaml
+**/pnpm-lock.yaml
+
+# Salesforce DX project (source-of-truth + generated bundles) and local state
+agentscript
+.sf
+.sfdx
+**/.sfdx
+
+# Assets
+media

@@ -4,6 +4,8 @@ export * from "./ChatInput";
 export * from "./ChatHeader";
 export * from "./ChatMessage";
 export * from "./ChatMessageList";
+export * from "./ResponseFormats";
+export * from "./formatRegistry";
 export * from "./ChatMinimized";
 export * from "./ChatErrorBoundary";
 export * from "./LoadingContainer";

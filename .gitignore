@@ -13,6 +13,12 @@ dist-ssr
 *.local
 .env
 
+# Salesforce DX local state
+.sf/
+.sfdx/
+.localdevserver/
+deploy-options.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

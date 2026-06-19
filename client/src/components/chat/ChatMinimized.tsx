@@ -1,5 +1,5 @@
 import { MessageCircle } from "lucide-react";
-import { useTheme, themeConfig } from '../../hooks';
+import { useTheme, themeConfig } from "../../hooks";
 
 export const ChatMinimized = ({ onMaximize }: { onMaximize: () => void }) => {
   const { theme } = useTheme();

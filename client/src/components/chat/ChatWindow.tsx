@@ -103,6 +103,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           isLoading={isLoading || isTyping}
           error={!!error}
           messagesEndRef={messagesEndRef}
+          onQuickReply={(value) => {
+            if (isConnected) sendMessage(value);
+          }}
+          quickRepliesDisabled={!isConnected || isLoading}
         />
 
         <ChatInput

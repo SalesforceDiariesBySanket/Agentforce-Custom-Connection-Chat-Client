@@ -1,0 +1,28 @@
+{
+  "required" : [ "visitorName", "visitorEmail", "visitorMessage" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "visitorEmail" : {
+      "title" : "Visitor Email",
+      "description" : "The visitor's email address",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "visitorMessage" : {
+      "title" : "Visitor Message",
+      "description" : "Why the visitor wants to connect",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "visitorName" : {
+      "title" : "Visitor Name",
+      "description" : "The visitor's full name",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

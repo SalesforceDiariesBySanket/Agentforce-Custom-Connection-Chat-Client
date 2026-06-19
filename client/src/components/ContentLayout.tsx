@@ -1,14 +1,14 @@
-import React from 'react';
-import { ExternalLink, BookOpen } from 'lucide-react';
-import { FaGithub, FaYoutube } from 'react-icons/fa'
-import { Collapsible } from './Collapsible';
+import React from "react";
+import { ExternalLink, BookOpen } from "lucide-react";
+import { FaGithub, FaYoutube } from "react-icons/fa";
+import { Collapsible } from "./Collapsible";
 
 const ResourceCard = ({
   icon: Icon,
   title,
   description,
   link,
-  children
+  children,
 }: {
   icon: React.ElementType;
   title: string;
@@ -23,8 +23,7 @@ const ResourceCard = ({
     <div className="flex items-start gap-4">
       <Icon className="w-5 h-5 text-gray-600 flex-shrink-0 mt-1" />
       <div>
-        <a href={link}
-          target="_blank">
+        <a href={link} target="_blank">
           <h3 className="text-lg font-medium flex items-center gap-2">
             {title}
             <ExternalLink className="w-4 h-4 text-gray-400" />
@@ -38,10 +37,10 @@ const ResourceCard = ({
 );
 
 const IMPLEMENTATION_FEATURES = [
-  'Real-time messaging with Server-Sent Events',
-  'Typing indicators and read receipts',
-  'Seamless agent handoff',
-  'React + TypeScript implementation'
+  "Real-time messaging with Server-Sent Events",
+  "Typing indicators and read receipts",
+  "Seamless agent handoff",
+  "React + TypeScript implementation",
 ];
 
 const ContentLayout = () => {
@@ -49,14 +48,20 @@ const ContentLayout = () => {
     <div className="max-w-2xl mx-auto">
       {/* Introduction */}
       <p className="text-gray-600 mb-8">
-        Experience a custom implementation of Salesforce's Messaging for In-App and Web APIs. This
-        demo showcases a fully functional chat interface built with React and TypeScript.
+        Experience a custom implementation of Salesforce's Messaging for In-App
+        and Web APIs. This demo showcases a fully functional chat interface
+        built with React and TypeScript.
       </p>
 
       <section className="bg-slate-50 border-l-4 border-slate-500 p-4 mb-8 rounded-r-lg">
-        <h2 className="font-medium text-lg text-slate-900 mb-3">How to Use the Demo</h2>
+        <h2 className="font-medium text-lg text-slate-900 mb-3">
+          How to Use the Demo
+        </h2>
         <ol className="list-decimal list-inside space-y-2 text-slate-800">
-          <li>Click the chat bubble in the bottom right corner to open the chat window</li>
+          <li>
+            Click the chat bubble in the bottom right corner to open the chat
+            window
+          </li>
           <li>Wait for the AI agent to connect and greet you</li>
           <li>Type your message and press send or hit Enter</li>
           <li>Experience real-time messaging with simulated agent responses</li>
@@ -102,7 +107,9 @@ const ContentLayout = () => {
               link="https://youtube.com/https://www.youtube.com/live/1vuZfPEtuUM?si=WvJ2OTJF3txlezLG"
             >
               <div className="bg-blue-50 rounded p-4 text-sm">
-                <div className="font-medium text-blue-900 mb-2">Quick Start:</div>
+                <div className="font-medium text-blue-900 mb-2">
+                  Quick Start:
+                </div>
                 <ol className="list-decimal list-inside space-y-1 text-blue-800">
                   <li>Follow the tutorial</li>
                   <li>Clone the repository</li>

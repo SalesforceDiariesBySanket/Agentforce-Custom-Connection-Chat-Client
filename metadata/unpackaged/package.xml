@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>*</members>
+        <name>AiResponseFormat</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>AiSurface</name>
+    </types>
+    <!--
+      GenAiPlannerBundle is intentionally NOT deployed from here by default.
+      Deploying a planner bundle REPLACES the existing one, so you must add the
+      <plannerSurfaces> entry to YOUR agent's real bundle and deploy that.
+      See ../genAiPlannerBundles/README.md. To deploy it from here, retrieve
+      your bundle into genAiPlannerBundles/ and uncomment the block below.
+
+    <types>
+        <members>*</members>
+        <name>GenAiPlannerBundle</name>
+    </types>
+    -->
+    <version>66.0</version>
+</Package>

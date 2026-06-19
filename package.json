@@ -16,16 +16,18 @@
   "scripts": {
     "dev:client": "cd client && pnpm dev",
     "dev:server": "cd server && pnpm dev",
-    "dev": "pnpm dev:server & pnpm dev:client",
-    "build:client": "tsc && cd client && pnpm build && cp -r dist ../server/",
-    "build:server": "cd server && tsc",
-    "build": "pnpm build:client & pnpm build:server",
+    "dev": "concurrently -n server,client -c blue,green \"pnpm dev:server\" \"pnpm dev:client\"",
+    "build:client": "cd client && pnpm build",
+    "build:server": "cd server && pnpm build",
+    "copy:web": "node scripts/copy-web.mjs",
+    "build": "pnpm build:server && pnpm build:client && pnpm copy:web",
     "start": "cd server && node dist/index.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "CC0-1.0",
   "devDependencies": {
+    "concurrently": "^9.1.0",
     "prettier": "^3.4.2"
   },
   "dependencies": {

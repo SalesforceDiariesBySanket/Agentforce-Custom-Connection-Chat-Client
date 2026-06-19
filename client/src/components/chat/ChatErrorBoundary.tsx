@@ -10,7 +10,7 @@ interface State {
 
 export class ChatErrorBoundary extends React.Component<Props, State> {
   state: State = {
-    hasError: false
+    hasError: false,
   };
 
   static getDerivedStateFromError(): State {

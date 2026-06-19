@@ -3,9 +3,12 @@ import cors from "@fastify/cors";
 import dotenv from "dotenv";
 import path from "node:path";
 import fastifyStatic from "@fastify/static";
-import messagingRoutes from "./routes.js";
+import agentRoutes from "./routes.js";
 
 dotenv.config();
+
+const PORT = Number(process.env.PORT) || 8080;
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 
 const server = fastify({
   logger: true,
@@ -19,7 +22,7 @@ async function start() {
     });
 
     await server.register(cors, {
-      origin: ["http://localhost:5173"],
+      origin: [CLIENT_ORIGIN],
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
       credentials: true,
       allowedHeaders: [
@@ -28,20 +31,19 @@ async function start() {
         "Accept",
         "Origin",
         "X-Requested-With",
-        "x-conversation-id",
       ],
       exposedHeaders: ["*"],
       maxAge: 86400,
     });
 
-    await server.register(messagingRoutes, { prefix: "/api" });
+    await server.register(agentRoutes, { prefix: "/api" });
 
     server.setNotFoundHandler((request, reply) => {
       return reply.sendFile("index.html");
     });
 
-    await server.listen({ port: 8080 });
-    console.log("Server running at http://localhost:8080");
+    await server.listen({ port: PORT });
+    console.log(`Server running at http://localhost:${PORT}`);
   } catch (err) {
     server.log.error(err);
     process.exit(1);

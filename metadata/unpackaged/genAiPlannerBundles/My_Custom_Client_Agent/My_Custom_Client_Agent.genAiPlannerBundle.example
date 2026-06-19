@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  TEMPLATE ONLY (note the .example extension so it is never deployed as-is).
+
+  This shows where the <plannerSurfaces> entry goes. Do NOT deploy a bundle that
+  contains only this entry: it would replace your agent and remove its topics
+  and actions. Instead, retrieve your real GenAiPlannerBundle, add the
+  <plannerSurfaces> block below, and redeploy that file.
+-->
+<GenAiPlannerBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Your agent description</description>
+
+    <!-- Keep all of your existing configuration: topics, genAiPlugins, etc. -->
+
+    <plannerSurfaces>
+        <callRecordingAllowed>false</callRecordingAllowed>
+        <surface>CustomChatClient_CustomChatClient01</surface>
+        <surfaceType>Custom</surfaceType>
+    </plannerSurfaces>
+</GenAiPlannerBundle>

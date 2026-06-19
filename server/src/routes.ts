@@ -1,81 +1,74 @@
 import { FastifyInstance } from "fastify";
 import {
-  messageSchema,
-  typingSchema,
-  messagesSchema,
-  initializeSchema,
-  endChatSchema,
-  serverSentEventsSchema,
+  createSessionSchema,
+  endSessionSchema,
+  sendMessageSchema,
 } from "./schema";
 import {
-  handleEndChat,
-  handleGetMessages,
-  handleInitialize,
+  handleCreateSession,
+  handleEndSession,
   handleSendMessage,
-  handleSSEConnection,
-  handleTypingIndicator,
 } from "./handlers";
-import { MessageRequest, ServerSentEventRequest, TypingRequest } from "./types";
+import {
+  EndSessionRequest,
+  SalesforceConfig,
+  SendMessageRequest,
+} from "./types";
 
-export default async function messagingRoutes(fastify: FastifyInstance) {
-  if (
-    !process.env.SALESFORCE_SCRT_URL ||
-    !process.env.SALESFORCE_ORG_ID ||
-    !process.env.SALESFORCE_DEVELOPER_NAME
-  ) {
-    throw new Error("Missing required environment variables");
+function buildConfig(): SalesforceConfig {
+  const {
+    SF_MY_DOMAIN_URL,
+    SF_CLIENT_ID,
+    SF_CLIENT_SECRET,
+    SF_AGENT_ID,
+    SF_API_HOST,
+    SF_SURFACE_TYPE,
+    SF_BYPASS_USER,
+  } = process.env;
+
+  if (!SF_MY_DOMAIN_URL || !SF_CLIENT_ID || !SF_CLIENT_SECRET || !SF_AGENT_ID) {
+    throw new Error(
+      "Missing required environment variables: SF_MY_DOMAIN_URL, SF_CLIENT_ID, SF_CLIENT_SECRET, SF_AGENT_ID"
+    );
   }
 
-  const salesforceConfig = {
-    scrtUrl: process.env.SALESFORCE_SCRT_URL,
-    orgId: process.env.SALESFORCE_ORG_ID,
-    esDeveloperName: process.env.SALESFORCE_DEVELOPER_NAME,
+  const bypassUser =
+    SF_BYPASS_USER === "false"
+      ? "false"
+      : SF_BYPASS_USER === "omit"
+        ? "omit"
+        : "true";
+
+  return {
+    myDomainUrl: SF_MY_DOMAIN_URL.replace(/\/+$/, ""),
+    clientId: SF_CLIENT_ID,
+    clientSecret: SF_CLIENT_SECRET,
+    agentId: SF_AGENT_ID,
+    apiHost: SF_API_HOST?.replace(/\/+$/, ""),
+    surfaceType: SF_SURFACE_TYPE || "Custom",
+    bypassUser,
   };
+}
 
-  fastify.get(
-    "/chat/initialize",
-    {
-      schema: initializeSchema,
-    },
-    () => handleInitialize(salesforceConfig)
+export default async function agentRoutes(fastify: FastifyInstance) {
+  const config = buildConfig();
+
+  // Start a new Agent API session (opts into the custom connection surface).
+  fastify.post("/chat/session", { schema: createSessionSchema }, () =>
+    handleCreateSession(config)
   );
 
-  fastify.post<MessageRequest>(
+  // Send a message; response is streamed back as Server-Sent Events.
+  fastify.post<SendMessageRequest>(
     "/chat/message",
-    {
-      schema: messageSchema,
-    },
-    async (request) => handleSendMessage(salesforceConfig, request)
+    { schema: sendMessageSchema },
+    (request, reply) => handleSendMessage(config, request, reply)
   );
 
-  fastify.post<TypingRequest>(
-    "/chat/typing",
-    {
-      schema: typingSchema,
-    },
-    async (request) => handleTypingIndicator(salesforceConfig, request)
-  );
-
-  fastify.get<ServerSentEventRequest>(
-    "/chat/sse",
-    { schema: serverSentEventsSchema },
-    async (request, reply) =>
-      handleSSEConnection(salesforceConfig, request, reply)
-  );
-
-  fastify.get<MessageRequest>(
-    "/chat/message",
-    {
-      schema: messagesSchema,
-    },
-    async (request) => handleGetMessages(salesforceConfig, request)
-  );
-
-  fastify.post<MessageRequest>(
-    "/chat/end",
-    {
-      schema: endChatSchema,
-    },
-    async (request) => handleEndChat(salesforceConfig, request)
+  // End the session.
+  fastify.delete<EndSessionRequest>(
+    "/chat/session",
+    { schema: endSessionSchema },
+    (request) => handleEndSession(config, request)
   );
 }

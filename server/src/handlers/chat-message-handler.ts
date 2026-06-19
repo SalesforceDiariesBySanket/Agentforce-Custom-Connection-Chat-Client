@@ -1,117 +1,88 @@
-import { FastifyRequest } from "fastify";
-import { BaseMessageRequest, MessageRequest, SalesforceConfig } from "../types";
-import axios from "axios";
+import { FastifyReply, FastifyRequest } from "fastify";
+import { Readable } from "node:stream";
+import { ReadableStream } from "node:stream/web";
+import { SalesforceConfig, SendMessageRequest } from "../types";
+import { clearTokenCache, getAccessToken } from "./salesforce-auth";
+import { getAgentApiBase } from "./chat-session-handler";
 
+const DEFAULT_CLIENT_ORIGIN = "http://localhost:5173";
+
+/**
+ * Sends a user message to the Agent API streaming endpoint and proxies the
+ * raw server-sent event stream back to the browser. The client parses the
+ * stream (TextChunk / Inform / EndOfTurn events) and renders the result,
+ * including any custom-connection structured response format.
+ */
 export async function handleSendMessage(
-  salesforceConfig: SalesforceConfig,
-  request: FastifyRequest<MessageRequest>
+  config: SalesforceConfig,
+  request: FastifyRequest<SendMessageRequest>,
+  reply: FastifyReply
 ) {
-  const conversationId = request.headers["x-conversation-id"];
-  const token = request.headers.authorization.split(" ")[1];
+  const { sessionId, message, sequenceId } = request.body;
 
-  await axios.post(
-    `https://${salesforceConfig.scrtUrl}/iamessage/api/v2/conversation/${conversationId}/message`,
-    {
-      message: {
-        id: crypto.randomUUID(),
-        messageType: "StaticContentMessage",
-        staticContent: {
-          formatType: "Text",
-          text: request.body.message,
-        },
-      },
-      esDeveloperName: salesforceConfig.esDeveloperName,
-      isNewMessagingSession: false,
-      language: "",
+  const payload = JSON.stringify({
+    message: {
+      sequenceId: sequenceId ?? Date.now(),
+      type: "Text",
+      text: message,
     },
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-}
-
-// We don't actually use this, but if you wanted to retrieve old conversation or existing ones,
-// you could using this handler. Note: the most recent message is at the start of the array.
-export async function handleGetMessages(
-  salesforceConfig: SalesforceConfig,
-  request: FastifyRequest<BaseMessageRequest>
-) {
-  const token = request.headers.authorization.split(" ")[1];
-  if (!token) {
-    throw new Error("Missing authentication token");
-  }
-
-  const conversationId = request.headers["x-conversation-id"];
-
-  const response = await axios.get(
-    `https://${salesforceConfig.scrtUrl}/iamessage/api/v2/conversation/${conversationId}/entries`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-      params: {
-        limit: 50,
-        direction: "FromEnd",
-      },
-    }
-  );
-
-  const unsortedEntries = parseMessageEntries(
-    response.data.conversationEntries
-  );
-
-  const sortedEntries = unsortedEntries.sort(
-    (a, b) => a.timestamp - b.timestamp
-  );
-
-  const entries = sortedEntries.map((entry) => ({
-    id: entry.id,
-    content: entry.content,
-    sender: {
-      role: entry.sender.role === "endUser" ? "user" : "ai",
-      displayName: "",
-    },
-    timestamp: new Date(entry.timestamp),
-  }));
-
-  return { entries };
-}
-
-interface ParsedMessageEntry {
-  id: string;
-  content: string;
-  sender: {
-    role: "endUser" | "agent" | "system";
-    displayName: string;
-  };
-  timestamp: number;
-}
-
-function parseMessageEntries(entries: any[]): ParsedMessageEntry[] {
-  const filteredEntries = entries.filter((entry) => {
-    return (
-      entry.entryType === "Message" &&
-      entry.entryPayload?.abstractMessage?.staticContent?.text
-    );
   });
 
-  const mappedEntries = filteredEntries.map((entry) => {
-    const result = {
-      id: entry.entryPayload.abstractMessage.id,
-      content: entry.entryPayload.abstractMessage.staticContent.text,
-      sender: {
-        role: mapSenderRole(entry.sender.role),
-        displayName: entry.senderDisplayName || "Unknown",
-      },
-      timestamp: entry.clientTimestamp,
-    };
-    return result;
-  }) as ParsedMessageEntry[];
+  const sendStreamRequest = async (forceRefresh: boolean) => {
+    const { accessToken, apiInstanceUrl } = await getAccessToken(
+      config,
+      forceRefresh
+    );
+    const base = getAgentApiBase(config, apiInstanceUrl);
+    return fetch(
+      `${base}/einstein/ai-agent/v1/sessions/${sessionId}/messages/stream`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "text/event-stream",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: payload,
+      }
+    );
+  };
 
-  return mappedEntries;
-}
+  let upstream = await sendStreamRequest(false);
+  if (upstream.status === 401) {
+    clearTokenCache();
+    upstream = await sendStreamRequest(true);
+  }
 
-function mapSenderRole(role: string): string {
-  const normalizedRole = role.toLowerCase();
-  if (normalizedRole === "chatbot") return "agent";
-  if (normalizedRole === "enduser") return "endUser";
-  return "unknown";
+  if (!upstream.ok || !upstream.body) {
+    const detail = await upstream.text().catch(() => "");
+    reply.code(upstream.status || 502).send({
+      error: "Failed to stream message from the Agent API",
+      detail,
+    });
+    return;
+  }
+
+  // Take over the socket; we stream raw SSE bytes ourselves.
+  reply.hijack();
+  reply.raw.writeHead(200, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive",
+    "Access-Control-Allow-Origin":
+      process.env.CLIENT_ORIGIN || DEFAULT_CLIENT_ORIGIN,
+    "Access-Control-Allow-Credentials": "true",
+  });
+
+  const nodeStream = Readable.fromWeb(
+    upstream.body as unknown as ReadableStream
+  );
+
+  request.raw.on("close", () => nodeStream.destroy());
+  nodeStream.on("error", () => {
+    nodeStream.destroy();
+    reply.raw.end();
+  });
+
+  nodeStream.pipe(reply.raw);
 }

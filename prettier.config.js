@@ -6,7 +6,4 @@ module.exports = {
   tabWidth: 2,
   useTabs: false,
   printWidth: 80,
-  importOrder: ["^@/(.*)$", "^[./]"],
-  importOrderSeparation: true,
-  importOrderSortSpecifiers: true
-}
+};

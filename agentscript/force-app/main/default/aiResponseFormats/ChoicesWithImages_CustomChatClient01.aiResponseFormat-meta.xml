@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AiResponseFormat xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Use this format to present a collection of selectable choices where an image is essential to the decision, such as product listings, location cards, or avatar pickers. Use it only when there are GREATER THAN 1 and FEWER THAN 8 choices and each choice has an associated image.</description>
+    <input>{&quot;type&quot;:&quot;object&quot;,&quot;properties&quot;:{&quot;message&quot;:{&quot;type&quot;:&quot;string&quot;,&quot;description&quot;:&quot;A short prompt that introduces the choices.&quot;},&quot;choices&quot;:{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:{&quot;type&quot;:&quot;object&quot;,&quot;properties&quot;:{&quot;title&quot;:{&quot;type&quot;:&quot;string&quot;,&quot;description&quot;:&quot;The choice title.&quot;},&quot;imageUrl&quot;:{&quot;type&quot;:&quot;string&quot;,&quot;description&quot;:&quot;An absolute https URL to the choice image.&quot;},&quot;actionText&quot;:{&quot;type&quot;:&quot;string&quot;,&quot;description&quot;:&quot;The label for the selection button.&quot;}},&quot;required&quot;:[&quot;title&quot;,&quot;imageUrl&quot;,&quot;actionText&quot;]}}},&quot;required&quot;:[&quot;message&quot;,&quot;choices&quot;]}</input>
+    <instructions>
+        <instruction>Use ChoicesWithImages when offering GREATER THAN 1 and FEWER THAN 8 choices that each include an image, such as product listings. Provide a title, an absolute https imageUrl, and an actionText button label for each choice.</instruction>
+        <sortOrder>2</sortOrder>
+    </instructions>
+    <masterLabel>Choices With Images</masterLabel>
+</AiResponseFormat>
