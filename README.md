@@ -1,5 +1,8 @@
 # Agentforce Custom Chat Client
 
+[![CI](https://github.com/SalesforceDiariesBySanket/Agentforce-Custom-Connection-Chat-Client/actions/workflows/ci.yml/badge.svg)](https://github.com/SalesforceDiariesBySanket/Agentforce-Custom-Connection-Chat-Client/actions/workflows/ci.yml)
+[![License: CC0-1.0](https://img.shields.io/badge/License-CC0_1.0-lightgrey.svg)](./LICENSE)
+
 A modern React-based chat interface for **Agentforce** built directly on the
 [Agent API](https://developer.salesforce.com/docs/ai/agentforce/guide/agent-api-get-started.html).
 It uses [Custom Connections](https://developer.salesforce.com/docs/ai/agentforce/guide/custom-connections.html)
@@ -13,6 +16,26 @@ CSS, and Fastify.
 > In-App and Web (MIAW) API is a separate, Salesforce-managed `Messaging`
 > surface and cannot return custom response formats — so this client talks to
 > the Agent API directly.
+
+## Demo
+
+Captured from a **live Agent API session**. When a turn maps to 2–7 pickable
+items, the agent emits a **Text Choices** structured format that the client
+renders as tappable buttons; anything else falls back to streamed plain text. A
+light/dark theme is built in.
+
+<table>
+  <tr>
+    <td align="center"><b>Landing page</b></td>
+    <td align="center"><b>Text Choices — light</b></td>
+    <td align="center"><b>Text Choices — dark</b></td>
+  </tr>
+  <tr>
+    <td valign="top"><img src="media/demo-landing.png" width="250" alt="Landing page describing the custom-connection client"></td>
+    <td valign="top"><img src="media/demo-text-choices.png" width="250" alt="Agent reply rendered as tappable Text Choices in the light theme"></td>
+    <td valign="top"><img src="media/demo-dark.png" width="250" alt="The same Text Choices reply in the dark theme"></td>
+  </tr>
+</table>
 
 ## Features
 

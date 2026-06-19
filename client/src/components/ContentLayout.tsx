@@ -37,10 +37,12 @@ const ResourceCard = ({
 );
 
 const IMPLEMENTATION_FEATURES = [
-  "Real-time messaging with Server-Sent Events",
-  "Typing indicators and read receipts",
-  "Seamless agent handoff",
-  "React + TypeScript implementation",
+  "Structured response formats: quick-reply choices & image cards",
+  "Real-time streamed responses (Server-Sent Events)",
+  "Graceful fallback to plain text",
+  "Voice input with speech recognition",
+  "Light / dark theme",
+  "React + TypeScript + Tailwind CSS",
 ];
 
 const ContentLayout = () => {
@@ -48,9 +50,11 @@ const ContentLayout = () => {
     <div className="max-w-2xl mx-auto">
       {/* Introduction */}
       <p className="text-gray-600 mb-8">
-        Experience a custom implementation of Salesforce's Messaging for In-App
-        and Web APIs. This demo showcases a fully functional chat interface
-        built with React and TypeScript.
+        A custom-connection chat client for Agentforce, built directly on the
+        Agent API. The agent returns structured response formats — quick-reply
+        choices and image cards — that this client renders as native UI, with a
+        graceful fallback to streamed plain text. Built with React, TypeScript,
+        and Tailwind CSS.
       </p>
 
       <section className="bg-slate-50 border-l-4 border-slate-500 p-4 mb-8 rounded-r-lg">
@@ -64,7 +68,10 @@ const ContentLayout = () => {
           </li>
           <li>Wait for the AI agent to connect and greet you</li>
           <li>Type your message and press send or hit Enter</li>
-          <li>Experience real-time messaging with simulated agent responses</li>
+          <li>
+            Experience real-time streamed responses — with quick-reply choices
+            and image cards when the agent applies a structured format
+          </li>
           <li>Use the minimize or close buttons to manage the chat window</li>
         </ol>
       </section>
@@ -104,7 +111,7 @@ const ContentLayout = () => {
               icon={FaYoutube}
               title="Setup Tutorial"
               description="Watch this comprehensive guide to configure and deploy an Agentforce Service Agent in your Salesforce org."
-              link="https://youtube.com/https://www.youtube.com/live/1vuZfPEtuUM?si=WvJ2OTJF3txlezLG"
+              link="https://www.youtube.com/live/1vuZfPEtuUM?si=WvJ2OTJF3txlezLG"
             >
               <div className="bg-blue-50 rounded p-4 text-sm">
                 <div className="font-medium text-blue-900 mb-2">
@@ -123,14 +130,14 @@ const ContentLayout = () => {
               icon={FaGithub}
               title="Source Code"
               description="Get the complete source code on GitHub. Includes implementation details and setup instructions."
-              link="https://github.com/charlesw-salesforce/agentforce-custom-client"
+              link="https://github.com/SalesforceDiariesBySanket/Agentforce-Custom-Connection-Chat-Client"
             />
 
             <ResourceCard
               icon={BookOpen}
               title="Official Documentation"
-              description="Explore Salesforce's comprehensive documentation on Messaging for In-App and Web APIs."
-              link="https://help.salesforce.com/s/articleView?id=sf.miaw_deployment_custom.htm"
+              description="Explore Salesforce's documentation on the Agent API and custom connections."
+              link="https://developer.salesforce.com/docs/ai/agentforce/guide/custom-connections.html"
             />
           </div>
         </Collapsible>

@@ -19,7 +19,7 @@ const AppContent: React.FC = () => {
           <h1 className="text-lg lg:text-2xl font-medium">
             Agentforce Custom Client Demo
           </h1>
-          <GitHubLink href="https://github.com/charlesw-salesforce/agentforce-custom-client" />
+          <GitHubLink href="https://github.com/SalesforceDiariesBySanket/Agentforce-Custom-Connection-Chat-Client" />
         </div>
       </div>
 
