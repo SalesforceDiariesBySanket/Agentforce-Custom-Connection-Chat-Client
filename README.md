@@ -276,6 +276,72 @@ stream and renders the formats.
    structured formats — see [`metadata/README.md`](./metadata/README.md). Skip
    this and the app still works with plain-text responses.
 
+## Add Sample Data to Test the Agent
+
+The sample agent answers from a custom object,
+[`Portfolio_Item__c`](./agentscript/force-app/main/default/objects/Portfolio_Item__c),
+which the Apex actions
+([`PortfolioItemProvider`](./agentscript/force-app/main/default/classes/PortfolioItemProvider.cls),
+[`PortfolioOverviewProvider`](./agentscript/force-app/main/default/classes/PortfolioOverviewProvider.cls))
+query. The repo ships the **object schema but no records**, so a freshly
+deployed org has nothing for the agent to talk about. Push a few sample records
+to test it end to end.
+
+> No data is included in this repo — create your own. The records below are just
+> placeholders to exercise the different response formats.
+
+1. **Deploy the object and Apex** (from the `agentscript/` project) if you
+   haven't already:
+
+   ```bash
+   cd agentscript
+   sf project deploy start \
+     --source-dir force-app/main/default/objects/Portfolio_Item__c \
+     --source-dir force-app/main/default/classes \
+     --target-org <your-org-alias>
+   ```
+
+2. **Insert a few sample records** with anonymous Apex. Save this as
+   `seed.apex` and run it:
+
+   ```apex
+   // seed.apex — sample Portfolio_Item__c records for testing the agent
+   insert new List<Portfolio_Item__c>{
+     new Portfolio_Item__c(Name='About Me', Type__c='Bio', Active__c=true, Sort_Order__c=1,
+       Description__c='Salesforce developer exploring Agentforce.'),
+     new Portfolio_Item__c(Name='Senior Salesforce Developer', Type__c='Experience', Active__c=true,
+       Sort_Order__c=2, Subtitle__c='Acme Corp', Description__c='Built Agentforce agents and LWC apps.'),
+     new Portfolio_Item__c(Name='Apex', Type__c='Skill', Active__c=true, Sort_Order__c=3),
+     new Portfolio_Item__c(Name='Lightning Web Components', Type__c='Skill', Active__c=true, Sort_Order__c=4),
+     // 3 Services with images → exercises the "Choices With Images" card carousel
+     new Portfolio_Item__c(Name='1:1 Mentoring', Type__c='Service', Active__c=true, Sort_Order__c=5,
+       Subtitle__c='Careers & certifications', Description__c='Career guidance and certification prep.',
+       Image_URL__c='https://placehold.co/600x400?text=Mentoring'),
+     new Portfolio_Item__c(Name='Salesforce & Agentforce Consulting', Type__c='Service', Active__c=true,
+       Sort_Order__c=6, Subtitle__c='Architecture & delivery', Description__c='Architecture reviews and AI agent design.',
+       Image_URL__c='https://placehold.co/600x400?text=Consulting'),
+     new Portfolio_Item__c(Name='Speaking & Workshops', Type__c='Service', Active__c=true, Sort_Order__c=7,
+       Subtitle__c='Events & teams', Description__c='Talks and hands-on workshops.',
+       Image_URL__c='https://placehold.co/600x400?text=Speaking')
+   };
+   ```
+
+   ```bash
+   sf apex run --file seed.apex --target-org <your-org-alias>
+   ```
+
+   You can also add records by hand: **App Launcher → Portfolio Items → New**.
+
+**Tips**
+
+- `Type__c` is **required** and drives how items are grouped (`Bio`, `Experience`,
+  `Skill`, `Service`, `Certification`, `Project`, …). `Active__c` must be `true`
+  (the default) or the item is hidden from the agent.
+- Asking _"What services do you offer?"_ returns **2–7** items, which the agent
+  presents as **Text Choices**; items with a real `Image_URL__c` can render as
+  **image cards**. Categories with a single item or more than 7 fall back to
+  plain text.
+
 ## Quick Start
 
 1. Install dependencies:
